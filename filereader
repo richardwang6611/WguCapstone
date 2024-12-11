@@ -1,0 +1,14 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = pd.read_csv('lung_cancer.csv')  # Replace with the correct dataset file name
+# print(data.info())
+# print(data.head())
+
+
+data['SMOKING'].hist(bins=10, edgecolor='black')  # Adjust bins if needed
+
+plt.title('Distribution of Smoking Habits')
+plt.xlabel('Smoking (1 = Non-Smoker, 2 = Smoker)')
+plt.ylabel('Frequency')
+plt.show()
