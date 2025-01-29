@@ -3,6 +3,7 @@ import tensorflow as tf
 from PIL import Image
 import numpy as np
 from fileReader import load_data
+import os
 
 def main():
     st.title("Lung Cancer Detection")
@@ -16,14 +17,28 @@ def main():
     option = st.sidebar.radio("Go to", ["Upload Image"])
 
     if option == "Upload Image":
-        st.subheader("Select the Actual Class and Upload an Image")
-        actual_class = st.selectbox("Select the actual class of the uploaded image:", class_names)
+        st.subheader("Upload an Image")
 
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-        if uploaded_file is not None and actual_class:
+        if uploaded_file is not None:
             image = Image.open(uploaded_file)
             st.image(image, caption='Uploaded Image', use_column_width=True)
+
+            # Extract the class label from the file name
+            file_name = os.path.basename(uploaded_file.name)
+            actual_class = file_name.split('_')[0]  # Assuming the class label is the first part of the file name
+
+            # Normalize the actual class to match the format of class names
+            actual_class = actual_class.lower().replace(" ", "_")
+
+            # Map the actual class to the correct format if necessary
+            class_mapping = {
+                'lungn': 'lung_n',
+                'lungaca': 'lung_aca',
+                'lungscc': 'lung_scc'
+            }
+            actual_class = class_mapping.get(actual_class, actual_class)
 
             img = image.resize((224, 224))
             img_array = np.array(img) / 255.0
@@ -37,10 +52,8 @@ def main():
             st.subheader("Prediction")
             predicted_class_name = class_names[predicted_class]
 
-            if actual_class == predicted_class_name:
-                st.markdown(f"<h3 style='color: green;'>Actual: {actual_class} | Predicted: {predicted_class_name}</h3>", unsafe_allow_html=True)
-            else:
-                st.markdown(f"<h3 style='color: red;'>Actual: {actual_class} | Predicted: {predicted_class_name}</h3>", unsafe_allow_html=True)
+            # Display the actual class and predicted class
+            st.markdown(f"<h3>Actual: {actual_class} | Predicted: {predicted_class_name}</h3>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
